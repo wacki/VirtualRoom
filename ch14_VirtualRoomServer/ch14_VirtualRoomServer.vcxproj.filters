@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="VRServerStarter.cpp" />
+    <ClCompile Include="VRServer.cpp" />
+    <ClCompile Include="VRColorSphereServer.cpp" />
+    <ClCompile Include="VRBoardGameServer.cpp" />
+    <ClCompile Include="VRBoardGame.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="VRTicTacToeGame.cpp">
+      <Filter>Game\TicTacToe</Filter>
+    </ClCompile>
+    <ClCompile Include="VRConnectFourGame.cpp">
+      <Filter>Game\ConnectFour</Filter>
+    </ClCompile>
+    <ClCompile Include="VRConnectFourFallingSphereSimulation.cpp">
+      <Filter>Game\ConnectFour</Filter>
+    </ClCompile>
+    <ClCompile Include="VRBoardFieldSelectorConfirm.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="VRBoardPlayField.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="VRBoardField.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="VRBoardFieldSelectorContinuous.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="VRTurnTableServer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="VRServer.h" />
+    <ClInclude Include="VRColorSphereServer.h" />
+    <ClInclude Include="VRBoardGame.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="VRPlayer.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="VRBoardGameServer.h" />
+    <ClInclude Include="VRTicTacToeGame.h">
+      <Filter>Game\TicTacToe</Filter>
+    </ClInclude>
+    <ClInclude Include="VRConnectFourGame.h">
+      <Filter>Game\ConnectFour</Filter>
+    </ClInclude>
+    <ClInclude Include="VRBoardGameSimulation.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="VRConnectFourFallingSphereSimulation.h">
+      <Filter>Game\ConnectFour</Filter>
+    </ClInclude>
+    <ClInclude Include="VRBoardFieldSelector.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="VRBoardFieldSelectorConfirm.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="VRBoardPlayField.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="VRBoardField.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="VRBoardFieldSelectorContinuous.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="VRTurnTableServer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Game">
+      <UniqueIdentifier>{c3e50c90-88c0-4131-9c9d-9e075a0a8231}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\TicTacToe">
+      <UniqueIdentifier>{f1b88261-0131-44d6-81f7-5cb878f4f5bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\ConnectFour">
+      <UniqueIdentifier>{2641ed1f-04e3-4161-82a6-c45d569d297c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

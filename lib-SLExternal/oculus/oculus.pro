@@ -15,8 +15,6 @@ CONFIG += staticlib
 CONFIG -= qt
 CONFIG += warn_off
 
-QMAKE_CXXFLAGS += -std=c++11
-
 DEFINES += _UNICODE
 
 #define platform variable for folder name
@@ -38,19 +36,16 @@ INCLUDEPATH += \
     3rdParty \
     3rdParty/TinyXml \
     3rdParty/glext
-
+ 
 
 HEADERS += \
     LibOVR/Src/OVR_CAPI.h \
-    LibOVR/Src/OVR_CAPI_Keys.h \
-    LibOVR/Src/Util/Util_SystemInfo.h \
     LibOVR/Src/OVR_CAPI_D3D.h \
     LibOVR/Src/OVR_CAPI_GL.h \
     LibOVR/Src/OVR_JSON.h \
     LibOVR/Src/OVR_Profile.h \
     LibOVR/Src/OVR_SerialFormat.h \
     LibOVR/Src/OVR_Stereo.h \
-    LibOVR/Src/CAPI/CAPI_LatencyStatistics.h \
     LibOVR/Src/CAPI/GL/CAPI_GL_DistortionRenderer.h \
     LibOVR/Src/CAPI/GL/CAPI_GL_DistortionShaders.h \
     LibOVR/Src/CAPI/GL/CAPI_GL_HSWDisplay.h \
@@ -119,7 +114,6 @@ SOURCES += \
     LibOVR/Src/OVR_Profile.cpp \
     LibOVR/Src/OVR_SerialFormat.cpp \
     LibOVR/Src/OVR_Stereo.cpp \
-    LibOVR/Src/CAPI/GL/CAPI_GLE.cpp \
     LibOVR/Src/CAPI/GL/CAPI_GL_DistortionRenderer.cpp \
     LibOVR/Src/CAPI/GL/CAPI_GL_HSWDisplay.cpp \
     LibOVR/Src/CAPI/GL/CAPI_GL_Util.cpp \
@@ -128,7 +122,6 @@ SOURCES += \
     LibOVR/Src/CAPI/CAPI_HMDRenderState.cpp \
     LibOVR/Src/CAPI/CAPI_HMDState.cpp \
     LibOVR/Src/CAPI/CAPI_HSWDisplay.cpp \
-    LibOVR/Src/CAPI/CAPI_LatencyStatistics.cpp \
     LibOVR/Src/Kernel/OVR_Alg.cpp \
     LibOVR/Src/Kernel/OVR_Allocator.cpp \
     LibOVR/Src/Kernel/OVR_Atomic.cpp \
@@ -159,22 +152,20 @@ SOURCES += \
     LibOVR/Src/Tracking/Tracking_SensorStateReader.cpp \
     LibOVR/Src/Util/Util_ImageWindow.cpp \
     LibOVR/Src/Util/Util_LatencyTest2Reader.cpp \
-    LibOVR/Src/Util/Util_Render_Stereo.cpp \
-    LibOVR/Src/Util/Util_SystemInfo.cpp
+    LibOVR/Src/Util/Util_Render_Stereo.cpp
 
 macx {
 HEADERS += \
     LibOVR/Src/Displays/OVR_OSX_Display.h \
+    LibOVR/Src/Displays/OVR_OSX_FocusObserver.h \
+    LibOVR/Src/Displays/OVR_OSX_FocusReader.h \
     LibOVR/Src/Net/OVR_Unix_Socket.h
 
 
 SOURCES += \
     LibOVR/Src/Displays/OVR_OSX_Display.cpp \
     LibOVR/Src/Net/OVR_Unix_Socket.cpp \
-    LibOVR/Src/Kernel/OVR_ThreadsPthread.cpp \
-
-OBJECTIVE_SOURCES += \
-    LibOVR/Src/Util/Util_SystemInfo_OSX.mm \
+    LibOVR/Src/Kernel/OVR_ThreadsPthread.cpp
 }
 
 win32 {
@@ -186,8 +177,8 @@ HEADERS += \
     LibOVR/Src/CAPI/D3D1X/CAPI_D3D1X_DistortionRenderer.h \
     LibOVR/Src/CAPI/D3D1X/CAPI_D3D1X_HSWDisplay.h \
     LibOVR/Src/CAPI/D3D1X/CAPI_D3D1X_Util.h \
-    LibOVR/Src/CAPI/D3D9/CAPI_D3D9_DistortionRenderer.h \
-    LibOVR/Src/CAPI/D3D9/CAPI_D3D9_HSWDisplay.h \
+    LibOVR/Src/CAPI/D3D1X/CAPI_D3D9_DistortionRenderer.h \
+    LibOVR/Src/CAPI/D3D1X/CAPI_D3D9_HSWDisplay.h \
     LibOVR/Src/CAPI/Shaders/Distortion_ps.h \
     LibOVR/Src/CAPI/Shaders/Distortion_ps_refl.h \
     LibOVR/Src/CAPI/Shaders/Distortion_vs.h \
@@ -208,8 +199,6 @@ HEADERS += \
     LibOVR/Src/CAPI/Shaders/SimpleTexturedQuad_ps_refl.h \
     LibOVR/Src/CAPI/Shaders/SimpleTexturedQuad_vs.h \
     LibOVR/Src/CAPI/Shaders/SimpleTexturedQuad_vs_refl.h \
-    LibOVR/Src/CAPI/GL/CAPI_GLE.h \
-    LibOVR/Src/CAPI/GL/CAPI_GLE_GL.h \
     LibOVR/Src/Displays/OVR_Win32_Display.h \
     LibOVR/Src/Displays/OVR_Win32_Dxgi_Display.h \
     LibOVR/Src/Displays/OVR_Win32_FocusReader.h \
@@ -224,9 +213,9 @@ SOURCES += \
     LibOVR/Src/CAPI/D3D1X/CAPI_D3D1X_DistortionRenderer.cpp \
     LibOVR/Src/CAPI/D3D1X/CAPI_D3D1X_HSWDisplay.cpp \
     LibOVR/Src/CAPI/D3D1X/CAPI_D3D1X_Util.cpp \
-    LibOVR/Src/CAPI/D3D9/CAPI_D3D9_DistortionRenderer.cpp \
-    LibOVR/Src/CAPI/D3D9/CAPI_D3D9_HSWDisplay.cpp \
-    LibOVR/Src/CAPI/D3D9/CAPI_D3D9_Util.cpp \
+    LibOVR/Src/CAPI/D3D1X/CAPI_D3D9_DistortionRenderer.cpp \
+    LibOVR/Src/CAPI/D3D1X/CAPI_D3D9_HSWDisplay.cpp \
+    LibOVR/Src/CAPI/D3D1X/CAPI_D3D9_Util.cpp \
     LibOVR/Src/Displays/OVR_Win32_Display.cpp \
     LibOVR/Src/Displays/OVR_Win32_FocusReader.cpp \
     LibOVR/Src/Displays/OVR_Win32_RenderShim.cpp \

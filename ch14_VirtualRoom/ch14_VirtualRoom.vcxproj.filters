@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{4c136cc5-edee-41e1-8cb6-4dbd8ce75543}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{fe0ddc00-2c25-4fcf-b725-5dc695f2a94e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{37ec7759-8763-4230-94fd-853185ca5327}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Former SL additions">
+      <UniqueIdentifier>{fdcf09a7-c895-465d-ab8c-679a2ee08282}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\SLPerson.h" />
+    <ClInclude Include="include\VRSceneView.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRPerson.h" />
+    <ClInclude Include="include\VRNetworkClient.h" />
+    <ClInclude Include="include\VRGameScene.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRColorSphereGameScene.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRTicTacToeGameScene.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRConnectFourGameScene.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\KinectManager.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\KinectSkeletonControllerV2.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRSkeletonKinectBinding.h" />
+    <ClInclude Include="include\KinectSkeletonController.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\KinectSkeletonControllerV1.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRTurnTableGameScene.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRBoardGameScene.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SLSkeleton.h">
+      <Filter>Former SL additions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SLBoneNode.h">
+      <Filter>Former SL additions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SLNewMesh.h">
+      <Filter>Former SL additions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SLTrackingCamera.h">
+      <Filter>Former SL additions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SLImporter.h">
+      <Filter>Former SL additions</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\SLScene_onLoad.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SLPerson.cpp" />
+    <ClCompile Include="source\VRSceneView.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRPerson.cpp" />
+    <ClCompile Include="source\VRNetworkClient.cpp" />
+    <ClCompile Include="source\VRColorSphereGameScene.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRGameScene.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRTicTacToeGameScene.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRConnectFourGameScene.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\KinectManager.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="source\KinectSkeletonControllerV2.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRSkeletonKinectBinding.cpp" />
+    <ClCompile Include="source\KinectSkeletonControllerV1.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRTurnTableGameScene.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRBoardGameScene.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SLBoneNode.cpp">
+      <Filter>Former SL additions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SLNewMesh.cpp">
+      <Filter>Former SL additions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SLSkeleton.cpp">
+      <Filter>Former SL additions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\glfwMain.cpp" />
+    <ClCompile Include="source\SLTrackingCamera.cpp">
+      <Filter>Former SL additions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SLImporter.cpp">
+      <Filter>Former SL additions</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\_globals\oglsl\PerPixBlinn_Skinned.vert">
+      <Filter>Former SL additions</Filter>
+    </None>
+  </ItemGroup>
+</Project>

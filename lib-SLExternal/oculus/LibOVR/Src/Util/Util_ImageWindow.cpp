@@ -5,16 +5,16 @@ Content     :   An output object for windows that can display raw images for tes
 Created     :   March 13, 2014
 Authors     :   Dean Beeler
 
-Copyright   :   Copyright 2014 Oculus VR, LLC All Rights reserved.
+Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License"); 
+Licensed under the Oculus VR Rift SDK License Version 3.1 (the "License"); 
 you may not use the Oculus VR Rift SDK except in compliance with the License, 
 which is provided at the time of installation or download, or which 
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.2 
+http://www.oculusvr.com/licenses/LICENSE-3.1 
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK 
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -52,8 +52,6 @@ namespace OVR { namespace Util {
 	
 ID2D1Factory* ImageWindow::pD2DFactory = NULL;
 IDWriteFactory* ImageWindow::pDWriteFactory = NULL;
-HINSTANCE ImageWindow::hInstD2d1 = NULL;
-HINSTANCE ImageWindow::hInstDwrite = NULL;
 
 
 // TODO(review): This appears to be (at present) necessary, the global list is accessed by the
@@ -105,37 +103,24 @@ LRESULT CALLBACK MainWndProc(
 	//return 0; 
 }
 
-
 ImageWindow::ImageWindow( uint32_t width, uint32_t height ) :
-	hWindow(NULL), 
-    pRT(NULL), 
-  //resolution(),
-    frontBufferMutex( new Mutex() ),
-    frames(),
-    greyBitmap(NULL),
-    colorBitmap(NULL)
+	frontBufferMutex( new Mutex() )
 {
+
+	HINSTANCE hInst = LoadLibrary( L"d2d1.dll" );
+	HINSTANCE hInstWrite = LoadLibrary( L"Dwrite.dll" );
+
 	D2D1CreateFactoryFn createFactory = NULL;
 	DWriteCreateFactoryFn writeFactory = NULL;
 
-	if (!hInstD2d1)
-    {
-        hInstD2d1 = LoadLibraryW( L"d2d1.dll" );
-    }
-
-	if (!hInstD2d1)
-    {
-	    hInstD2d1 = LoadLibraryW( L"Dwrite.dll" );
-    }
-
-	if( hInstD2d1 )
+	if( hInst )
 	{
-		createFactory = (D2D1CreateFactoryFn)GetProcAddress( hInstD2d1, "D2D1CreateFactory" );
+		createFactory = (D2D1CreateFactoryFn)GetProcAddress( hInst, "D2D1CreateFactory" );
 	}
 
-	if( hInstDwrite )
+	if( hInstWrite )
 	{
-		writeFactory = (DWriteCreateFactoryFn)GetProcAddress( hInstDwrite, "DWriteCreateFactory" );
+		writeFactory = (DWriteCreateFactoryFn)GetProcAddress( hInstWrite, "DWriteCreateFactory" );
 	}
 
     // TODO: see note where globalWindow is declared.
@@ -144,30 +129,29 @@ ImageWindow::ImageWindow( uint32_t width, uint32_t height ) :
 
 	if( pD2DFactory == NULL && createFactory && writeFactory )
 	{
-        // Create a Direct2D factory.
-		HRESULT hResult = createFactory( 
+		createFactory( 
 			D2D1_FACTORY_TYPE_MULTI_THREADED,
 			__uuidof(ID2D1Factory),
 			NULL,
-			&pD2DFactory // This will be AddRef'd for us.
+			&pD2DFactory
 			);
-        OVR_ASSERT_AND_UNUSED(hResult == S_OK, hResult);
 
 		// Create a DirectWrite factory.
-		hResult = writeFactory(
+		writeFactory(
 			DWRITE_FACTORY_TYPE_SHARED,
-			__uuidof(pDWriteFactory), // This probably should instead be __uuidof(IDWriteFactory)
-			reinterpret_cast<IUnknown **>(&pDWriteFactory)  // This will be AddRef'd for us.
+			__uuidof(pDWriteFactory),
+			reinterpret_cast<IUnknown **>(&pDWriteFactory)
 			);
-        OVR_ASSERT_AND_UNUSED(hResult == S_OK, hResult);
+
 	}
 
 	resolution = D2D1::SizeU( width, height );
 
-	if (hWindow)
-    {
-        SetWindowLongPtr( hWindow, GWLP_USERDATA, (LONG_PTR)this );
-    }
+	SetWindowLongPtr( hWindow, GWLP_USERDATA, (LONG_PTR)this );
+
+	pRT = NULL;
+	greyBitmap = NULL;
+	colorBitmap = NULL;
 }
 
 ImageWindow::~ImageWindow()
@@ -201,110 +185,81 @@ ImageWindow::~ImageWindow()
 
 	delete frontBufferMutex;
 
-	if (hWindow)
-    {
-	    ShowWindow( hWindow, SW_HIDE );
-	    DestroyWindow( hWindow );
-    }
-
-    if (pD2DFactory)
-    {
-        pD2DFactory->Release();
-        pD2DFactory = NULL;
-    }
-
-    if (pDWriteFactory)
-    {
-        pDWriteFactory->Release();
-        pDWriteFactory = NULL;
-    }
-
-	if( hInstD2d1 )
-	{
-		FreeLibrary(hInstD2d1);
-        hInstD2d1 = NULL;
-	}
-
-	if( hInstDwrite )
-	{
-		FreeLibrary(hInstDwrite);
-        hInstDwrite = NULL;
-	}
+	ShowWindow( hWindow, SW_HIDE );
+	DestroyWindow( hWindow );
 }
 
 void ImageWindow::AssociateSurface( void* surface )
 {
-    if (pD2DFactory)
-    {
-	    // Assume an IUnknown
-	    IUnknown* unknown = (IUnknown*)surface;
+	// Assume an IUnknown
+	IUnknown* unknown = (IUnknown*)surface;
 
-	    IDXGISurface *pDxgiSurface = NULL;
-	    HRESULT hr = unknown->QueryInterface(&pDxgiSurface);
-	    if( hr == S_OK )
-	    {
-		    D2D1_RENDER_TARGET_PROPERTIES props =
-			    D2D1::RenderTargetProperties(
-			    D2D1_RENDER_TARGET_TYPE_DEFAULT,
-			    D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED),
-			    96,
-			    96
-			    );
+	IDXGISurface *pDxgiSurface = NULL;
+	HRESULT hr = unknown->QueryInterface(&pDxgiSurface);
+	if( hr == S_OK )
+	{
+		D2D1_RENDER_TARGET_PROPERTIES props =
+			D2D1::RenderTargetProperties(
+			D2D1_RENDER_TARGET_TYPE_DEFAULT,
+			D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED),
+			96,
+			96
+			);
 
-		    pRT = NULL;			
-		    ID2D1RenderTarget* tmpTarget;
 
-        	hr = pD2DFactory->CreateDxgiSurfaceRenderTarget( pDxgiSurface, &props, &tmpTarget );
+		pRT = NULL;			
+		ID2D1RenderTarget* tmpTarget;
 
-		    if( hr == S_OK )
-		    {
-			    DXGI_SURFACE_DESC desc = {0};
-			    pDxgiSurface->GetDesc( &desc );
-			    int width = desc.Width;
-			    int height = desc.Height;
+		hr = pD2DFactory->CreateDxgiSurfaceRenderTarget( pDxgiSurface, &props, &tmpTarget );
 
-			    D2D1_SIZE_U size = D2D1::SizeU( width, height );
+		if( hr == S_OK )
+		{
+			DXGI_SURFACE_DESC desc = {0};
+			pDxgiSurface->GetDesc( &desc );
+			int width = desc.Width;
+			int height = desc.Height;
 
-			    D2D1_PIXEL_FORMAT pixelFormat = D2D1::PixelFormat(
-				    DXGI_FORMAT_A8_UNORM,
-				    D2D1_ALPHA_MODE_PREMULTIPLIED
-				    );
+			D2D1_SIZE_U size = D2D1::SizeU( width, height );
 
-			    D2D1_PIXEL_FORMAT colorPixelFormat = D2D1::PixelFormat(
-				    DXGI_FORMAT_B8G8R8A8_UNORM,
-				    D2D1_ALPHA_MODE_PREMULTIPLIED
-				    );
+			D2D1_PIXEL_FORMAT pixelFormat = D2D1::PixelFormat(
+				DXGI_FORMAT_A8_UNORM,
+				D2D1_ALPHA_MODE_PREMULTIPLIED
+				);
 
-			    D2D1_BITMAP_PROPERTIES bitmapProps;
-			    bitmapProps.dpiX = 96;
-			    bitmapProps.dpiY = 96;
-			    bitmapProps.pixelFormat = pixelFormat;
+			D2D1_PIXEL_FORMAT colorPixelFormat = D2D1::PixelFormat(
+				DXGI_FORMAT_B8G8R8A8_UNORM,
+				D2D1_ALPHA_MODE_PREMULTIPLIED
+				);
 
-			    D2D1_BITMAP_PROPERTIES colorBitmapProps;
-			    colorBitmapProps.dpiX = 96;
-			    colorBitmapProps.dpiY = 96;
-			    colorBitmapProps.pixelFormat = colorPixelFormat;
+			D2D1_BITMAP_PROPERTIES bitmapProps;
+			bitmapProps.dpiX = 96;
+			bitmapProps.dpiY = 96;
+			bitmapProps.pixelFormat = pixelFormat;
 
-			    HRESULT result = tmpTarget->CreateBitmap( size, bitmapProps, &greyBitmap );
-			    if( result != S_OK )
-			    {
-				    tmpTarget->Release();
-				    tmpTarget = NULL;
-			    }
+			D2D1_BITMAP_PROPERTIES colorBitmapProps;
+			colorBitmapProps.dpiX = 96;
+			colorBitmapProps.dpiY = 96;
+			colorBitmapProps.pixelFormat = colorPixelFormat;
 
-			    if (tmpTarget)
-			    {
-				    result = tmpTarget->CreateBitmap(size, colorBitmapProps, &colorBitmap);
-				    if (result != S_OK)
-				    {
-					    tmpTarget->Release();
-					    tmpTarget = NULL;
-				    }
-			    }
-			    pRT = tmpTarget;
-		    }
-	    }
-    }
+			HRESULT result = tmpTarget->CreateBitmap( size, bitmapProps, &greyBitmap );
+			if( result != S_OK )
+			{
+				tmpTarget->Release();
+				tmpTarget = NULL;
+			}
+
+			if (tmpTarget)
+			{
+				result = tmpTarget->CreateBitmap(size, colorBitmapProps, &colorBitmap);
+				if (result != S_OK)
+				{
+					tmpTarget->Release();
+					tmpTarget = NULL;
+				}
+			}
+			pRT = tmpTarget;
+		}
+	}
 }
 
 void ImageWindow::Process()

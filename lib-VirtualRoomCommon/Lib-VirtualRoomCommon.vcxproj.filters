@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="source\VRBaseMessage.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRClientData.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRConnectingAnswer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRConnectingQuestion.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRNetworkUtils.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VRBoardGameWorldState.cpp" />
+    <ClCompile Include="source\VRColorSphereWorldState.cpp" />
+    <ClCompile Include="source\VRConnectFourWorldState.cpp" />
+    <ClCompile Include="source\VRTicTacToeWorldState.cpp" />
+    <ClCompile Include="source\VRTurnTableWorldState.cpp" />
+    <ClCompile Include="source\VRWorldState.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\VRBaseMessage.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRClientData.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRConnectingQuestion.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRNetworkUtils.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRConnectingAnswer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VRTicTacToeConstants.h" />
+    <ClInclude Include="include\VRTicTacToeWorldState.h" />
+    <ClInclude Include="include\VRTurnTableWorldState.h" />
+    <ClInclude Include="include\VRTypes.h" />
+    <ClInclude Include="include\VRWorldState.h" />
+    <ClInclude Include="include\VRBoardGameConstants.h" />
+    <ClInclude Include="include\VRBoardGameWorldState.h" />
+    <ClInclude Include="include\VRColorSphereWorldState.h" />
+    <ClInclude Include="include\VRConnectFourConstants.h" />
+    <ClInclude Include="include\VRConnectFourWorldState.h" />
+    <ClInclude Include="include\VRPingPacket.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Network">
+      <UniqueIdentifier>{52dc7c4d-6eef-422b-a9f9-e7b13df475f0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+</Project>

@@ -6,16 +6,16 @@ Content     :   Template implementation for Array
 Created     :   September 19, 2012
 Notes       : 
 
-Copyright   :   Copyright 2014 Oculus VR, LLC All Rights reserved.
+Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License"); 
+Licensed under the Oculus VR Rift SDK License Version 3.1 (the "License"); 
 you may not use the Oculus VR Rift SDK except in compliance with the License, 
 which is provided at the time of installation or download, or which 
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.2 
+http://www.oculusvr.com/licenses/LICENSE-3.1 
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK 
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -240,7 +240,6 @@ struct ArrayData : ArrayDataBase<T, Allocator, SizePolicy>
     void PushBack(const ValueType& val)
     {
         BaseType::ResizeNoConstruct(this->Size + 1);
-        OVR_ASSERT(this->Data != NULL);
         Allocator::Construct(this->Data + this->Size - 1, val);
     }
 
@@ -394,31 +393,31 @@ public:
     // Basic access.
     ValueType& At(size_t index)
     {
-        OVR_ASSERT((Data.Data) && (index < Data.Size)); // Asserting that Data.Data is valid helps static analysis tools.
-        return Data.Data[index];
+        OVR_ASSERT(index < Data.Size);
+        return Data.Data[index]; 
     }
     const ValueType& At(size_t index) const
     {
-        OVR_ASSERT((Data.Data) && (index < Data.Size));
-        return Data.Data[index];
+        OVR_ASSERT(index < Data.Size);
+        return Data.Data[index]; 
     }
 
     ValueType ValueAt(size_t index) const
     {
-        OVR_ASSERT((Data.Data) && (index < Data.Size));
-        return Data.Data[index];
+        OVR_ASSERT(index < Data.Size);
+        return Data.Data[index]; 
     }
 
     // Basic access.
     ValueType& operator [] (size_t index)
     {
-        OVR_ASSERT((Data.Data) && (index < Data.Size));
+        OVR_ASSERT(index < Data.Size);
         return Data.Data[index]; 
     }
     const ValueType& operator [] (size_t index) const
     {
-        OVR_ASSERT((Data.Data) && (index < Data.Size));
-        return Data.Data[index];
+        OVR_ASSERT(index < Data.Size);
+        return Data.Data[index]; 
     }
 
     // Raw pointer to the data. Use with caution!
@@ -456,7 +455,6 @@ public:
 
     ValueType Pop()
     {
-        OVR_ASSERT((Data.Data) && (Data.Size > 0));
         ValueType t = Back();
         PopBack();
         return t;
@@ -475,7 +473,6 @@ public:
     const SelfType& operator = (const SelfType& a)   
     {
         Resize(a.GetSize());
-        OVR_ASSERT((Data.Data != NULL) || (Data.Size == 0));
         for (size_t i = 0; i < Data.Size; i++) {
             *(Data.Data + i) = a[i];
         }
@@ -508,7 +505,7 @@ public:
     // RemoveAt.
     void    RemoveAt(size_t index)
     {
-        OVR_ASSERT((Data.Data) && (index < Data.Size));
+        OVR_ASSERT(index < Data.Size);
         if (Data.Size == 1)
         {
             Clear();
@@ -529,7 +526,7 @@ public:
     // is important, otherwise use it instead of regular RemoveAt().
     void    RemoveAtUnordered(size_t index)
     {
-        OVR_ASSERT((Data.Data) && (index < Data.Size));
+        OVR_ASSERT(index < Data.Size);
         if (Data.Size == 1)
         {
             Clear();

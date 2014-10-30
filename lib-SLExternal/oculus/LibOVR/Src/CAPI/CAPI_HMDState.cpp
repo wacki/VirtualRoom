@@ -5,16 +5,16 @@ Content     :   State associated with a single HMD
 Created     :   January 24, 2014
 Authors     :   Michael Antonov
 
-Copyright   :   Copyright 2014 Oculus VR, LLC All Rights reserved.
+Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License"); 
+Licensed under the Oculus VR Rift SDK License Version 3.1 (the "License"); 
 you may not use the Oculus VR Rift SDK except in compliance with the License, 
 which is provided at the time of installation or download, or which 
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.2 
+http://www.oculusvr.com/licenses/LICENSE-3.1 
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK 
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -162,12 +162,11 @@ void HMDState::sharedInit(Profile* profile)
     BeginFrameThreadId = 0;
     BeginFrameTimingCalled = false;
 
+    TheSensorStateReader.LoadProfileCenteredFromWorld(profile);
+
     // Construct the HSWDisplay. We will later reconstruct it with a specific ovrRenderAPI type if the application starts using SDK-based rendering.
     if(!pHSWDisplay)
-    {
         pHSWDisplay = *OVR::CAPI::HSWDisplay::Factory(ovrRenderAPI_None, pHmdDesc, RenderState);
-        pHSWDisplay->Enable(pProfile->GetBoolValue("HSW", true));
-    }
 }
 
 static Vector3f GetNeckModelFromProfile(Profile* profile)
@@ -230,20 +229,7 @@ void HMDState::UpdateRenderProfile(Profile* profile)
             neckModel.z
         };
         pClient->SetNumberValues(GetNetId(), "NeckModelVector3f", neckModelArray, 3);
-
-        double camerastate[7];
-        if (profile->GetDoubleValues(OVR_KEY_CAMERA_POSITION, camerastate, 7) == 0)
-        {
-            //there is no value, so we load the default
-            for (int i = 0; i < 7; i++) camerastate[i] = 0;
-            camerastate[3] = 1;//no offset. by default, give the quaternion w component value 1
-        }
-        else
-
-        TheSensorStateReader.setCenteredFromWorld(OVR::Posed::FromArray(camerastate));
     }
-
-
 }
 
 HMDState* HMDState::CreateHMDState(NetClient* client, const HMDNetworkInfo& netInfo)
@@ -418,12 +404,7 @@ bool HMDState::getBoolValue(const char* propertyName, bool defaultVal)
 
 bool HMDState::setBoolValue(const char* propertyName, bool value)
 {
-	if (NetSessionCommon::IsServiceProperty(NetSessionCommon::ESetBoolValue, propertyName))
-	{
-		return NetClient::GetInstance()->SetBoolValue(GetNetId(), propertyName, value);
-	}
-
-	return false;
+    return NetClient::GetInstance()->SetBoolValue(GetNetId(), propertyName, value);
 }
 
 int HMDState::getIntValue(const char* propertyName, int defaultVal)
@@ -441,12 +422,7 @@ int HMDState::getIntValue(const char* propertyName, int defaultVal)
 
 bool HMDState::setIntValue(const char* propertyName, int value)
 {
-	if (NetSessionCommon::IsServiceProperty(NetSessionCommon::ESetIntValue, propertyName))
-	{
-		return NetClient::GetInstance()->SetIntValue(GetNetId(), propertyName, value);
-	}
-
-	return false;
+    return NetClient::GetInstance()->SetIntValue(GetNetId(), propertyName, value);
 }
 
 float HMDState::getFloatValue(const char* propertyName, float defaultVal)
@@ -477,12 +453,7 @@ float HMDState::getFloatValue(const char* propertyName, float defaultVal)
 
 bool HMDState::setFloatValue(const char* propertyName, float value)
 {
-	if (NetSessionCommon::IsServiceProperty(NetSessionCommon::ESetNumberValue, propertyName))
-	{
-		return NetClient::GetInstance()->SetNumberValue(GetNetId(), propertyName, value);
-	}
-
-	return false;
+    return NetClient::GetInstance()->SetNumberValue(GetNetId(), propertyName, value);
 }
 
 static unsigned CopyFloatArrayWithLimit(float dest[], unsigned destSize,
@@ -515,18 +486,10 @@ unsigned HMDState::getFloatArray(const char* propertyName, float values[], unsig
                 return 0;
             }
 
-            union {
-                struct X {
-                    float latencyRender, latencyTimewarp, latencyPostPresent;
-                } x;
-                float data[3];
-            } m;
-
-            static_assert(sizeof(m.x)==sizeof(m.data), "sizeof(struct X) failure");
-
-            TimeManager.GetLatencyTimings(m.x.latencyRender, m.x.latencyTimewarp, m.x.latencyPostPresent);
-
-            return CopyFloatArrayWithLimit(values, arraySize, m.data, 3);
+            float data[3];            
+            TimeManager.GetLatencyTimings(data);
+            
+            return CopyFloatArrayWithLimit(values, arraySize, data, 3);
         }
         else if (NetSessionCommon::IsServiceProperty(NetSessionCommon::EGetNumberValues, propertyName))
         {
@@ -554,8 +517,8 @@ unsigned HMDState::getFloatArray(const char* propertyName, float values[], unsig
 			//      we can return 0 in all conditions if property doesn't exist.
 		
             return pProfile->GetFloatValues(propertyName, values, arraySize);
+			}
 		}
-	}
 
 	return 0;
 }
@@ -573,22 +536,17 @@ bool HMDState::setFloatArray(const char* propertyName, float values[], unsigned 
         return true;
     }
 
-	if (NetSessionCommon::IsServiceProperty(NetSessionCommon::ESetNumberValues, propertyName))
-	{
-		double* da = new double[arraySize];
-		for (int i = 0; i < (int)arraySize; ++i)
-		{
-			da[i] = values[i];
-		}
+    double* da = new double[arraySize];
+    for (int i = 0; i < (int)arraySize; ++i)
+    {
+        da[i] = values[i];
+    }
 
-		bool result = NetClient::GetInstance()->SetNumberValues(GetNetId(), propertyName, da, arraySize);
+    bool result = NetClient::GetInstance()->SetNumberValues(GetNetId(), propertyName, da, arraySize);
 
-		delete[] da;
+    delete[] da;
 
-		return result;
-	}
-
-	return false;
+    return result;
 }
 
 const char* HMDState::getString(const char* propertyName, const char* defaultVal)
@@ -612,12 +570,7 @@ const char* HMDState::getString(const char* propertyName, const char* defaultVal
 
 bool HMDState::setString(const char* propertyName, const char* value)
 {
-	if (NetSessionCommon::IsServiceProperty(NetSessionCommon::ESetStringValue, propertyName))
-	{
-		return NetClient::GetInstance()->SetStringValue(GetNetId(), propertyName, value);
-	}
-
-	return false;
+    return NetClient::GetInstance()->SetStringValue(GetNetId(), propertyName, value);
 }
 
 
@@ -694,7 +647,7 @@ bool HMDState::ConfigureRendering(ovrEyeRenderDesc eyeRenderDescOut[2],
     }
 
     if (!pRenderer ||
-        !pRenderer->Initialize(apiConfig))
+        !pRenderer->Initialize(apiConfig, distortionCaps))
     {
         RenderingConfigured = false;
         return false;
@@ -708,10 +661,7 @@ bool HMDState::ConfigureRendering(ovrEyeRenderDesc eyeRenderDescOut[2],
     }
 
     if(!pHSWDisplay) // Use * below because that for of operator= causes it to inherit the refcount the factory gave the object.
-    {
         pHSWDisplay = *OVR::CAPI::HSWDisplay::Factory(apiConfig->Header.API, pHmdDesc, RenderState);
-        pHSWDisplay->Enable(pProfile->GetBoolValue("HSW", true));
-    }
 
     if (pHSWDisplay)
         pHSWDisplay->Initialize(apiConfig); // This is potentially re-initializing it with a new config.
@@ -750,8 +700,8 @@ ovrBool ovrHmd_CreateDistortionMeshInternal( ovrHmdStruct *  hmd,
     // Not used now, but Chromatic flag or others could possibly be checked for in the future.
     OVR_UNUSED1(distortionCaps); 
    
-#if defined (OVR_CC_MSVC)
-    static_assert(sizeof(DistortionMeshVertexData) == sizeof(ovrDistortionVertex), "DistortionMeshVertexData size mismatch");
+#if defined (OVR_OS_WIN32)
+    OVR_COMPILER_ASSERT(sizeof(DistortionMeshVertexData) == sizeof(ovrDistortionVertex));
 #endif
 	
     // *** Calculate a part of "StereoParams" needed for mesh generation

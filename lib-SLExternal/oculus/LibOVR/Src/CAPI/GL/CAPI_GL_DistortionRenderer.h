@@ -5,22 +5,11 @@ Content     :   Distortion renderer header for GL
 Created     :   November 11, 2013
 Authors     :   David Borel, Lee Cooper
 
-Copyright   :   Copyright 2014 Oculus VR, LLC All Rights reserved.
+Copyright   :   Copyright 2013 Oculus VR, Inc. All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License");
-you may not use the Oculus VR Rift SDK except in compliance with the License,
-which is provided at the time of installation or download, or which
+Use of this software is subject to the terms of the Oculus Inc license
+agreement provided at the time of installation or download, or which
 otherwise accompanies this software in either electronic or hard copy form.
-
-You may obtain a copy of the License at
-
-http://www.oculusvr.com/licenses/LICENSE-3.2
-
-Unless required by applicable law or agreed to in writing, the Oculus VR SDK
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 ************************************************************************************/
 
@@ -55,7 +44,8 @@ public:
 
     // ***** Public DistortionRenderer interface
 	
-    virtual bool Initialize(const ovrRenderAPIConfig* apiConfig) OVR_OVERRIDE;
+    virtual bool Initialize(const ovrRenderAPIConfig* apiConfig,
+                            unsigned distortionCaps);
 
     virtual void SubmitEye(int eyeId, const ovrTexture* eyeTexture);
 
@@ -115,6 +105,9 @@ protected:
         GLfloat ZoomY;
     };
 
+    // TBD: Should we be using oe from RState instead?
+    unsigned            DistortionCaps;
+
 	struct FOR_EACH_EYE
 	{
         FOR_EACH_EYE() : TextureSize(0), RenderViewport(Sizei(0)) { }
@@ -133,15 +126,10 @@ protected:
         Recti                     RenderViewport;
 	} eachEye[2];
 
-    Ptr<Texture>    pOverdriveTextures[NumOverdriveTextures];
-    Ptr<Texture>    OverdriveBackBufferTexture;
-
     // GL context and utility variables.
-    RenderParams        RParams;
-    Context             distortionContext;
+    RenderParams        RParams;    
 
 	// Helpers
-    void initOverdrive();
     void initBuffersAndShaders();
     void initShaders();
     void initFullscreenQuad();
@@ -169,8 +157,6 @@ protected:
 
 	Ptr<ShaderSet>      DistortionShader;
 
-    bool                RotateCCW90;
-
     struct StandardUniformData
     {
         Matrix4f  Proj;
@@ -182,7 +168,9 @@ protected:
     Ptr<ShaderSet>      SimpleQuadShader;
     Ptr<ShaderSet>      SimpleQuadGammaShader;
 
-    GLuint              OverdriveFbo;
+    Ptr<Texture>             CurRenderTarget;
+    Array<Ptr<Texture> >     DepthBuffers;
+    GLuint                   CurrentFbo;
 
 	GLint SavedViewport[4];
 	GLfloat SavedClearColor[4];

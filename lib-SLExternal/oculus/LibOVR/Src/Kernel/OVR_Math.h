@@ -7,16 +7,16 @@ Created     :   September 4, 2012
 Authors     :   Andrew Reisse, Michael Antonov, Steve LaValle, 
 				Anna Yershova, Max Katsev, Dov Katz
 
-Copyright   :   Copyright 2014 Oculus VR, LLC All Rights reserved.
+Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License"); 
+Licensed under the Oculus VR Rift SDK License Version 3.1 (the "License"); 
 you may not use the Oculus VR Rift SDK except in compliance with the License, 
 which is provided at the time of installation or download, or which 
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.2 
+http://www.oculusvr.com/licenses/LICENSE-3.1 
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK 
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -271,7 +271,7 @@ public:
 
     operator const CompatibleType& () const
     {
-        static_assert(sizeof(Vector2<T>) == sizeof(CompatibleType), "sizeof(Vector2<T>) failure");
+        OVR_COMPILER_ASSERT(sizeof(Vector2<T>) == sizeof(CompatibleType));
         return reinterpret_cast<const CompatibleType&>(*this);
     }
 
@@ -424,7 +424,7 @@ public:
 
     operator const CompatibleType& () const
     {
-        static_assert(sizeof(Vector3<T>) == sizeof(CompatibleType), "sizeof(Vector3<T>) failure");
+        OVR_COMPILER_ASSERT(sizeof(Vector3<T>) == sizeof(CompatibleType));
         return reinterpret_cast<const CompatibleType&>(*this);
     }
 
@@ -567,10 +567,6 @@ public:
 typedef Vector3<float>  Vector3f;
 typedef Vector3<double> Vector3d;
 typedef Vector3<int32_t>  Vector3i;
-    
-static_assert((sizeof(Vector3f) == 3*sizeof(float)), "sizeof(Vector3f) failure");
-static_assert((sizeof(Vector3d) == 3*sizeof(double)), "sizeof(Vector3d) failure");
-static_assert((sizeof(Vector3i) == 3*sizeof(int32_t)), "sizeof(Vector3i) failure");
 
 typedef Vector3<float>   Point3f;
 typedef Vector3<double>  Point3d;
@@ -609,7 +605,7 @@ public:
 
     operator const CompatibleType& () const
     {
-        static_assert(sizeof(Vector4<T>) == sizeof(CompatibleType), "sizeof(Vector4<T>) failure");
+        OVR_COMPILER_ASSERT(sizeof(Vector4<T>) == sizeof(CompatibleType));
         return reinterpret_cast<const CompatibleType&>(*this);
     }
 
@@ -793,7 +789,7 @@ public:
 
     operator const CompatibleType& () const
     {
-        static_assert(sizeof(Size<T>) == sizeof(CompatibleType), "sizeof(Size<T>) failure");
+        OVR_COMPILER_ASSERT(sizeof(Size<T>) == sizeof(CompatibleType));
         return reinterpret_cast<const CompatibleType&>(*this);
     }
 
@@ -857,7 +853,7 @@ public:
 
     operator const CompatibleType& () const
     {
-        static_assert(sizeof(Rect<T>) == sizeof(CompatibleType), "sizeof(Rect<T>) failure");
+        OVR_COMPILER_ASSERT(sizeof(Rect<T>) == sizeof(CompatibleType));
         return reinterpret_cast<const CompatibleType&>(*this);
     }
 
@@ -1172,7 +1168,7 @@ public:
 	template <Axis A1, Axis A2, Axis A3, RotateDirection D, HandedSystem S>
     void GetEulerAngles(T *a, T *b, T *c) const 
     {
-        static_assert((A1 != A2) && (A2 != A3) && (A1 != A3), "(A1 != A2) && (A2 != A3) && (A1 != A3)");
+        OVR_COMPILER_ASSERT((A1 != A2) && (A2 != A3) && (A1 != A3));
 
         T Q[3] = { x, y, z };  //Quaternion components x,y,z
 
@@ -1232,7 +1228,7 @@ public:
     template <Axis A1, Axis A2, RotateDirection D, HandedSystem S>
     void GetEulerAnglesABA(T *a, T *b, T *c) const
     {
-        static_assert(A1 != A2, "A1 != A2");
+        OVR_COMPILER_ASSERT(A1 != A2);
 
         T Q[3] = {x, y, z}; // Quaternion components
 
@@ -1280,9 +1276,6 @@ public:
 typedef Quat<float>  Quatf;
 typedef Quat<double> Quatd;
 
-static_assert((sizeof(Quatf) == 4*sizeof(float)), "sizeof(Quatf) failure");
-static_assert((sizeof(Quatd) == 4*sizeof(double)), "sizeof(Quatd) failure");
-
 //-------------------------------------------------------------------------------------
 // ***** Pose
 
@@ -1314,21 +1307,6 @@ public:
 
     Quat<T>    Rotation;
     Vector3<T> Translation;
-    
-    static_assert((sizeof(T) == sizeof(double) || sizeof(T) == sizeof(float)), "(sizeof(T) == sizeof(double) || sizeof(T) == sizeof(float))");
-
-    void ToArray(T* arr) const
-    {
-        T temp[7] =  { Rotation.x, Rotation.y, Rotation.z, Rotation.w, Translation.x, Translation.y, Translation.z };
-        for (int i = 0; i < 7; i++) arr[i] = temp[i];
-    }
-
-    static Pose<T> FromArray(const T* v)
-    {
-        Quat<T> rotation(v[0], v[1], v[2], v[3]);
-        Vector3<T> translation(v[4], v[5], v[6]);
-        return Pose<T>(rotation, translation);
-    }
 
     Vector3<T> Rotate(const Vector3<T>& v) const
     {
@@ -1360,9 +1338,6 @@ public:
 typedef Pose<float>  Posef;
 typedef Pose<double> Posed;
 
-static_assert((sizeof(Posed) == sizeof(Quatd) + sizeof(Vector3d)), "sizeof(Posed) failure");
-static_assert((sizeof(Posef) == sizeof(Quatf) + sizeof(Vector3f)), "sizeof(Posef) failure");
-    
 
 //-------------------------------------------------------------------------------------
 // ***** Matrix4
@@ -1463,14 +1438,14 @@ public:
     // C-interop support.
     Matrix4(const typename CompatibleTypes<Matrix4<T> >::Type& s) 
     {
-        static_assert(sizeof(s) == sizeof(Matrix4), "sizeof(s) == sizeof(Matrix4)");
+        OVR_COMPILER_ASSERT(sizeof(s) == sizeof(Matrix4));
         memcpy(M, s.M, sizeof(M));
     }
 
     operator typename CompatibleTypes<Matrix4<T> >::Type () const
     {
         typename CompatibleTypes<Matrix4<T> >::Type result;
-        static_assert(sizeof(result) == sizeof(Matrix4), "sizeof(result) == sizeof(Matrix4)");
+        OVR_COMPILER_ASSERT(sizeof(result) == sizeof(Matrix4));
         memcpy(result.M, M, sizeof(M));
         return result;
     }
@@ -1745,7 +1720,7 @@ public:
     template <Axis A1, Axis A2, Axis A3, RotateDirection D, HandedSystem S>
     void ToEulerAngles(T *a, T *b, T *c) const
     {
-        static_assert((A1 != A2) && (A2 != A3) && (A1 != A3), "(A1 != A2) && (A2 != A3) && (A1 != A3)");
+        OVR_COMPILER_ASSERT((A1 != A2) && (A2 != A3) && (A1 != A3));
 
         T psign = -1;
         if (((A1 + 1) % 3 == A2) && ((A2 + 1) % 3 == A3)) // Determine whether even permutation
@@ -1783,7 +1758,7 @@ public:
     template <Axis A1, Axis A2, RotateDirection D, HandedSystem S>
     void ToEulerAnglesABA(T *a, T *b, T *c) const
     {        
-         static_assert(A1 != A2, "A1 != A2");
+         OVR_COMPILER_ASSERT(A1 != A2);
   
         // Determine the axis that was not supplied
         int m = 3 - A1 - A2;
@@ -2190,14 +2165,14 @@ public:
 	// C-interop support.
 	Matrix3(const typename CompatibleTypes<Matrix3<T> >::Type& s) 
 	{
-		static_assert(sizeof(s) == sizeof(Matrix3), "sizeof(s) == sizeof(Matrix3)");
+		OVR_COMPILER_ASSERT(sizeof(s) == sizeof(Matrix3));
 		memcpy(M, s.M, sizeof(M));
 	}
 
 	operator const typename CompatibleTypes<Matrix3<T> >::Type () const
 	{
 		typename CompatibleTypes<Matrix3<T> >::Type result;
-		static_assert(sizeof(result) == sizeof(Matrix3), "sizeof(result) == sizeof(Matrix3)");
+		OVR_COMPILER_ASSERT(sizeof(result) == sizeof(Matrix3));
 		memcpy(result.M, M, sizeof(M));
 		return result;
 	}
@@ -2678,7 +2653,7 @@ public:
     Angle() : a(0) {}
     
 	// Fix the range to be between -Pi and Pi
-	Angle(T a_, AngularUnits u = Radians) : a((u == Radians) ? a_ : a_*((T)MATH_DOUBLE_DEGREETORADFACTOR)) { FixRange(); }
+	Angle(T a_, AngularUnits u = Radians) : a((u == Radians) ? a_ : ((T)MATH_DOUBLE_DEGREETORADFACTOR)) { FixRange(); }
 
 	T    Get(AngularUnits u = Radians) const       { return (u == Radians) ? a : a*((T)MATH_DOUBLE_RADTODEGREEFACTOR); }
 	void Set(const T& x, AngularUnits u = Radians) { a = (u == Radians) ? x : x*((T)MATH_DOUBLE_DEGREETORADFACTOR); FixRange(); }
